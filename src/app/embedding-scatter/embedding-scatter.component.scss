@@ -1,0 +1,30 @@
+canvas {
+    width: 800px;
+    height: 600px;
+  }
+
+
+.info-box {
+    position: absolute;
+     text-align: center;
+     padding: .2rem;
+     background: #313639;
+     color: #f9f9f9;
+     border: 1px;
+     border-radius: 8px;
+     pointer-events: none;
+     font-size: .7rem;
+  }
+  
+  .info-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .info-description {
+    margin-bottom: 5px;
+  }
+  
+  .info-point {
+    font-style: italic;
+  }
