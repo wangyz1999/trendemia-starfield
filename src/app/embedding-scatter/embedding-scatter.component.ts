@@ -1,18 +1,29 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import * as d3 from 'd3';
-import * as createREGL from 'regl';
+import { Observable, of } from 'rxjs';
+// import * as d3 from 'd3';
+// import * as createREGL from 'regl';
+import createScatterplot from 'regl-scatterplot';
+import { min } from 'd3';
+import { scaleLog } from 'd3-scale';
+// import { DataService } from './data.service';
 
 @Component({
   selector: 'app-embedding-scatter',
   templateUrl: './embedding-scatter.component.html',
   styleUrls: ['./embedding-scatter.component.scss']
 })
+
 export class EmbeddingScatterComponent implements AfterViewInit {
   @ViewChild('plot') plotElement!: ElementRef;
 
-  data: any[] = [];
+  points: any[] = [];
+  metadata: any[] = [];
   defaultRadius: number = 0.3;
+  colorList: string[] = [];
+  showBox: boolean = false;
+  selectedPoint: {title: string, date: number, id: string, categories: string} = {title: '', date: 0, id: '', categories: ''};
+
 
   constructor(private http: HttpClient) { }
 
@@ -21,60 +32,172 @@ export class EmbeddingScatterComponent implements AfterViewInit {
   }
 
   loadData() {
-    this.http.get<any[]>('/assets/data.json').subscribe((data) => {
-      this.data = data;
-      this.createChart();
+    this.http.get<any>('/assets/arxiv_categories.json').subscribe((categories) => {
+
+      const categoriesArray: Array<[number, string]> = [];
+      for (const [key, value] of Object.entries(categories)) {
+        const category = value as { id: number, color: string };
+        categoriesArray.push([category.id, category.color]);
+      }
+      // create colorlist from categoriesArray sort by id
+      this.colorList = categoriesArray.sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+
+      this.http.get<Array<{ x: number, y: number, cite: number, categories: string, title: string, date: number, id: string}>>('/assets/arxiv_embedding_top.json').subscribe((data) => {
+
+
+        // Initialize minCite and maxCite
+        let minCite = Infinity;
+        let maxCite = -Infinity;
+
+        // Find the minimum and maximum cite values in a single pass
+        for (const entry of data) {
+          if (entry.cite < minCite) minCite = entry.cite;
+          if (entry.cite > maxCite) maxCite = entry.cite;
+        }
+
+
+        // Convert and scale the data into the desired format using a for loop
+        this.points = [];
+        for (const entry of data) {
+          const scaledCite = (entry.cite - minCite) / (maxCite - minCite);
+          if (!categories[entry.categories.split(' ')[0]]) {
+            continue
+          }
+          const categoryColor = categories[entry.categories.split(' ')[0]].id;
+          this.points.push([entry.x, entry.y, categoryColor, scaledCite]);
+          this.metadata.push({ title: entry.title, date: entry.date, id: entry.id, categories: entry.categories });
+        }
+
+        // Proceed to create the chart
+        this.createChart();
+      });
     });
   }
 
   private createChart(): void {
 
-    const regl = createREGL(this.plotElement.nativeElement);
+    const canvas = this.plotElement.nativeElement;
 
-    const width = 800; // Canvas width
-    const height = 600; // Canvas height
+    const { width, height } = canvas.getBoundingClientRect();
 
-    // Set the canvas size
-    this.plotElement.nativeElement.width = width;
-    this.plotElement.nativeElement.height = height;
+    let opacityByDensityFill = 0.3;
+    let selection: any[];
 
-    const data = new Array(1000000).fill(0).map(() => ({
-      x: Math.random(),
-      y: Math.random()
-    }));
+    const lassoMinDelay = 10;
+    const lassoMinDist = 2;
+    const showReticle = true;
+    const reticleColor = [1, 1, 0.878431373, 0.33];
 
-    const points = data.map(d => [d.x * 2 - 1, d.y * 2 - 1]);
+    const selectHandler = ({ points: selectedPoints }: { points: any[] }) => {
+      console.log('Selected:', selectedPoints);
+      selection = selectedPoints;
+      if (selection.length === 1) {
+        const point = this.points[selection[0]];
+        const metadata = this.metadata[selection[0]];
+        this.selectedPoint = {title: metadata.title, date: metadata.date, id: metadata.id, categories: metadata.categories};
+        console.log(
+          `X: ${point[0]}\nY: ${point[1]}\nCategory: ${point[2]}\nValue: ${point[3]}`
+        );
+      }
+      this.showBox = true;
+    };
+    
+    const deselectHandler = () => {
+      console.log('Deselected:', selection);
+      selection = [];
+      this.showBox = false;
+    };
+    
 
-    const drawPoints = regl({
-      frag: `
-    precision mediump float;
-    void main() {
-      gl_FragColor = vec4(0, 1, 0, 1); // Color of points (Green)
-    }`,
-
-      vert: `
-    precision mediump float;
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0, 1);
-    }`,
-
-      attributes: {
-        position: points
-      },
-
-      count: points.length,
-
-      primitive: 'points'
+    const scatterplot = createScatterplot({
+      canvas,
+      width,
+      height,
+      opacityByDensityFill,
+      pointColorHover: [0.5, 0.5, 0.5, 0.5],
+      pointSizeSelected: 11,
+      pointOutlineWidth: 3
     });
 
-    regl.frame(() => {
-      regl.clear({
-        color: [0, 0, 0, 1], // Background color (White)
-        depth: 1
-      });
+    scatterplot.subscribe('select', selectHandler);
+    scatterplot.subscribe('deselect', deselectHandler);
 
-      drawPoints();
+    const getPointSizeRange = (basePointSize: number) => {
+      const pointSizeScale = scaleLog()
+        .domain([1, 10])
+        .range([basePointSize, basePointSize * 10]);
+
+      return Array(100)
+        .fill(0)
+        .map((x, i) => pointSizeScale(1 + (i / 99) * 9));
+    };
+
+
+    scatterplot.set({
+      sizeBy: 'value',
+      // pointSize: Array.from({ length: 20 }, (_, i) => Math.pow(30, i / (20 - 1)) * 1)
+      pointSize: getPointSizeRange(1.3)
+      // pointSize: [1, 2, 3, 10, 40]
     });
+
+    scatterplot.set({
+      opacityBy: 'density',
+    });
+
+    // scatterplot.set({
+    //   sizeBy: 'value',
+    //   // pointSize: Array.from({ length: 20 }, (_, i) => Math.pow(30, i / (20 - 1)) * 1)
+    //   pointSize: getPointSizeRange(0.1)
+    //   // pointSize: [1, 2, 3, 10, 40]
+    // });
+
+    scatterplot.set({ colorBy: 'category', pointColor: this.colorList });
+
+
+
+
+    scatterplot.draw(this.points);
+
+
+
+    // scatterplot.draw([
+    //   [0.1, 0.1, 0, 0],
+    //   [0.2, 0.2, 1, 0.25],
+    //   [0.3, 0.3, 2, 0.5],
+    //   [0.4, 0.4, 3, 0.75],
+    //   [0.5, 0.5, 4, 1],
+    // ]);
+
+    // const generatePoints = (length:number) => ({
+    //   x: Array.from({ length }, () => -1 + Math.random() * 2),
+    //   y: Array.from({ length }, () => -1 + Math.random() * 2),
+    //   z: Array.from({ length }, () => Math.round(Math.random())), // category
+    //   w: Array.from({ length }, () => Math.random()), // value
+    // });
+
+    // const setNumPoint = (newNumPoints:number) => {
+    //   const points = generatePoints(newNumPoints);
+    //   scatterplot.draw(points).then(() => {
+    //     // We'll select the first five points...
+    //     scatterplot.select([0]);
+    //     // ...and zoom into them
+    //     scatterplot.zoomToPoints([0], { transition: true })
+    //   })
+    // };
+
+    // const colorsCat = ['#00dd00', '#aa3a99'];
+    // scatterplot.set({ colorBy: 'category', pointColor: colorsCat });
+
+    // scatterplot.set({
+    //   sizeBy: 'value',
+    //   pointSize: [3,4, 60]
+    // });
+
+    // setNumPoint(10000);
+
+  }
+
+  closeBox() {
+    this.showBox = false;
   }
 }

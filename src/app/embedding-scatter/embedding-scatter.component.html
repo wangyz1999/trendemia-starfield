@@ -1,1 +1,13 @@
 <canvas #plot></canvas>
+<div class="slide-in-box" [ngClass]="{'show': showBox}">
+    <div class="close-cross" (click)="closeBox()">&#10005;</div>
+    <div class="info-content">
+        <p><strong>Title:</strong> {{selectedPoint.title}}</p>
+        
+        <p><strong>Date:</strong> {{selectedPoint.date}}</p>
+        <p><strong>Category:</strong> {{selectedPoint.categories}}</p>
+        <p><strong>id:</strong> <a href="https://arxiv.org/abs/{{selectedPoint.id}}" target="_blank" rel="noopener">{{selectedPoint.id}}</a></p>
+    </div>
+</div>
+
+<div #plotElement></div>

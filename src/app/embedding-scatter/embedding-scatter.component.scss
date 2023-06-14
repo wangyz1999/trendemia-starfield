@@ -1,30 +1,35 @@
 canvas {
-    width: 800px;
-    height: 600px;
-  }
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+}
 
 
-.info-box {
-    position: absolute;
-     text-align: center;
-     padding: .2rem;
-     background: #313639;
-     color: #f9f9f9;
-     border: 1px;
-     border-radius: 8px;
-     pointer-events: none;
-     font-size: .7rem;
-  }
-  
-  .info-title {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .info-description {
-    margin-bottom: 5px;
-  }
-  
-  .info-point {
-    font-style: italic;
-  }
+.slide-in-box {
+  position: fixed;
+  top: 90px;
+  right: -250px;
+  width: 200px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  transition: right 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.slide-in-box.show {
+  right: 10px;
+}
+
+.close-cross {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.info-content {
+  padding-top: 10px;
+}
