@@ -6,11 +6,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EmbeddingScatterComponent } from './embedding-scatter/embedding-scatter.component';
+import { NavbarComponent } from './navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EmbeddingScatterComponent
+    EmbeddingScatterComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,

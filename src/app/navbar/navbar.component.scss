@@ -1,0 +1,35 @@
+.navbar {
+    background-color: #000000;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 20px;
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+}
+
+.navbar-brand {
+    font-family: 'Roboto', sans-serif;
+    font-size: 2em;
+    font-weight: bold;
+    display: inline-block;
+    letter-spacing: 1px;
+}
+
+.navbar-right a {
+    margin-left: 10px;
+}
+
+.title-visualization {
+    background: linear-gradient(to right, #df3923 0%, #cfba18 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline;
+}

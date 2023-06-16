@@ -22,7 +22,7 @@ export class EmbeddingScatterComponent implements AfterViewInit {
   defaultRadius: number = 0.3;
   colorList: string[] = [];
   showBox: boolean = false;
-  selectedPoint: {title: string, date: number, id: string, categories: string} = {title: '', date: 0, id: '', categories: ''};
+  selectedPoint: { title: string, date: number, id: string, categories: string } = { title: '', date: 0, id: '', categories: '' };
 
 
   constructor(private http: HttpClient) { }
@@ -42,8 +42,7 @@ export class EmbeddingScatterComponent implements AfterViewInit {
       // create colorlist from categoriesArray sort by id
       this.colorList = categoriesArray.sort((a, b) => a[0] - b[0]).map((x) => x[1]);
 
-      this.http.get<Array<{ x: number, y: number, cite: number, categories: string, title: string, date: number, id: string}>>('/assets/arxiv_embedding_top.json').subscribe((data) => {
-
+      this.http.get<Array<{ x: number, y: number, cite: number, categories: string, title: string, date: number, id: string }>>('/assets/arxiv_embedding_top.json').subscribe((data) => {
 
         // Initialize minCite and maxCite
         let minCite = Infinity;
@@ -54,7 +53,6 @@ export class EmbeddingScatterComponent implements AfterViewInit {
           if (entry.cite < minCite) minCite = entry.cite;
           if (entry.cite > maxCite) maxCite = entry.cite;
         }
-
 
         // Convert and scale the data into the desired format using a for loop
         this.points = [];
@@ -94,25 +92,22 @@ export class EmbeddingScatterComponent implements AfterViewInit {
       if (selection.length === 1) {
         const point = this.points[selection[0]];
         const metadata = this.metadata[selection[0]];
-        this.selectedPoint = {title: metadata.title, date: metadata.date, id: metadata.id, categories: metadata.categories};
+        this.selectedPoint = { title: metadata.title, date: metadata.date, id: metadata.id, categories: metadata.categories };
         console.log(
           `X: ${point[0]}\nY: ${point[1]}\nCategory: ${point[2]}\nValue: ${point[3]}`
         );
       }
       this.showBox = true;
     };
-    
+
     const deselectHandler = () => {
       console.log('Deselected:', selection);
       selection = [];
       this.showBox = false;
     };
-    
 
     const scatterplot = createScatterplot({
       canvas,
-      width,
-      height,
       opacityByDensityFill,
       pointColorHover: [0.5, 0.5, 0.5, 0.5],
       pointSizeSelected: 11,
@@ -132,7 +127,6 @@ export class EmbeddingScatterComponent implements AfterViewInit {
         .map((x, i) => pointSizeScale(1 + (i / 99) * 9));
     };
 
-
     scatterplot.set({
       sizeBy: 'value',
       // pointSize: Array.from({ length: 20 }, (_, i) => Math.pow(30, i / (20 - 1)) * 1)
@@ -144,57 +138,8 @@ export class EmbeddingScatterComponent implements AfterViewInit {
       opacityBy: 'density',
     });
 
-    // scatterplot.set({
-    //   sizeBy: 'value',
-    //   // pointSize: Array.from({ length: 20 }, (_, i) => Math.pow(30, i / (20 - 1)) * 1)
-    //   pointSize: getPointSizeRange(0.1)
-    //   // pointSize: [1, 2, 3, 10, 40]
-    // });
-
     scatterplot.set({ colorBy: 'category', pointColor: this.colorList });
-
-
-
-
     scatterplot.draw(this.points);
-
-
-
-    // scatterplot.draw([
-    //   [0.1, 0.1, 0, 0],
-    //   [0.2, 0.2, 1, 0.25],
-    //   [0.3, 0.3, 2, 0.5],
-    //   [0.4, 0.4, 3, 0.75],
-    //   [0.5, 0.5, 4, 1],
-    // ]);
-
-    // const generatePoints = (length:number) => ({
-    //   x: Array.from({ length }, () => -1 + Math.random() * 2),
-    //   y: Array.from({ length }, () => -1 + Math.random() * 2),
-    //   z: Array.from({ length }, () => Math.round(Math.random())), // category
-    //   w: Array.from({ length }, () => Math.random()), // value
-    // });
-
-    // const setNumPoint = (newNumPoints:number) => {
-    //   const points = generatePoints(newNumPoints);
-    //   scatterplot.draw(points).then(() => {
-    //     // We'll select the first five points...
-    //     scatterplot.select([0]);
-    //     // ...and zoom into them
-    //     scatterplot.zoomToPoints([0], { transition: true })
-    //   })
-    // };
-
-    // const colorsCat = ['#00dd00', '#aa3a99'];
-    // scatterplot.set({ colorBy: 'category', pointColor: colorsCat });
-
-    // scatterplot.set({
-    //   sizeBy: 'value',
-    //   pointSize: [3,4, 60]
-    // });
-
-    // setNumPoint(10000);
-
   }
 
   closeBox() {

@@ -4,45 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Embedding Visualization</title>
-    <script type="text/javascript" async
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js">
-    </script>
-
-    <script>
-        MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']]
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
-    </script>
-
 
 </head>
 
 <body>
-
-    <header>
-        <h1>Arxiv Paper Embedding Visualization</h1>
-    </header>
-
     <main>
-        <p>This is an inline equation: $E = mc^2$</p>
-<p>This is a display equation: $$E = mc^2$$</p>
-
-        <p ng-non-bindable>This is an inline equation: $E = mc^2$</p>
-<p ng-non-bindable>This is a display equation: $$E = mc^2$$</p>
-
-        <!-- Here is where your custom component gets rendered -->
+        <app-navbar></app-navbar>
         <app-embedding-scatter></app-embedding-scatter>
     </main>
-
-    <footer>
-        <p>Created with Angular and D3.js</p>
-    </footer>
-
 </body>
 
 </html>

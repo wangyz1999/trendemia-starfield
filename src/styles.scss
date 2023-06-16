@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body {
+    height: 100vh; /* 100% of the viewport height */
+    width: 100%; /* 100% of the viewport width */
+    overflow: hidden; /* Hide scrollbars */
+    margin: 0;
+    padding: 0;
+}
+
