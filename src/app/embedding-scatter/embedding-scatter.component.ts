@@ -7,6 +7,8 @@ import createScatterplot from 'regl-scatterplot';
 import { min } from 'd3';
 import { scaleLog } from 'd3-scale';
 // import { DataService } from './data.service';
+import { checkSupport } from './utils';
+
 
 @Component({
   selector: 'app-embedding-scatter',
@@ -114,6 +116,8 @@ export class EmbeddingScatterComponent implements AfterViewInit {
       pointOutlineWidth: 3
     });
 
+    checkSupport(scatterplot);
+
     scatterplot.subscribe('select', selectHandler);
     scatterplot.subscribe('deselect', deselectHandler);
 
@@ -145,4 +149,5 @@ export class EmbeddingScatterComponent implements AfterViewInit {
   closeBox() {
     this.showBox = false;
   }
+  
 }
