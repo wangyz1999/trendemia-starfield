@@ -1,6 +1,6 @@
 # Trendemia: Your Gateway to Accelerated Academic Research
 
-![Trendemia Logo](./src/assets/logo.png)
+![Trendemia Logo](./src/assets/demo.jpg)
 
 Welcome to Trendemia, an AI-powered research analysis tool that has been meticulously crafted to serve the modern-day academic research community. We leverage the power of AI to transform how researchers interact with academic literature, thus streamlining the research process.
 
