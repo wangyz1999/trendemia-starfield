@@ -27,9 +27,16 @@
     margin-left: 10px;
 }
 
-.title-visualization {
-    background: linear-gradient(to right, #df3923 0%, #cfba18 100%);
-    -webkit-background-clip: text;
+.title-trendemia {
+    background: linear-gradient(to right, #fda000 0%, #d3208b 100%);
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline;
-}
+  }
+
+  .title-visualization {
+    background: linear-gradient(to right, #d3208b 0%, #879af2 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline;
+  }

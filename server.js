@@ -4,11 +4,11 @@ const path = require('path');
 const app = express();
 
 // Serve static files
-app.use(express.static(__dirname + '/dist/research-dym'));
+app.use(express.static(__dirname + '/dist/trendemia'));
 
 // Send all requests to Angular app
 app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname + '/dist/research-dym/index.html'));
+    res.sendFile(path.join(__dirname + '/dist/trendemia/index.html'));
 });
 
 // Default Heroku port or your custom port and log message in a fancy way
