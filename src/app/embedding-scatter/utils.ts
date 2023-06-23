@@ -49,4 +49,39 @@ export function checkSupport(scatterplot: any): void { // You might want to repl
     // console.log("checkSupport")
 }
 
+// function to darken a color
+export function darkenColor(color: string, amount: number): string {
+    const num = parseInt(color.replace("#",""), 16),
+          amt = Math.round(2.55 * amount),
+          R = (num >> 16) - amt,
+          B = ((num >> 8) & 0x00FF) - amt,
+          G = (num & 0x0000FF) - amt;
+    return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+}
+
+// function to lighten a color
+export function lightenColor(color: string, amount: number): string {
+    const num = parseInt(color.replace("#",""), 16),
+          amt = Math.round(2.55 * amount),
+          R = (num >> 16) + amt,
+          B = ((num >> 8) & 0x00FF) + amt,
+          G = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+}
+
+// function to draw a point with border
+export function drawPoint(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string, thickness: number): void {
+    const lighterColor = lightenColor(color, 30);  // lighten by 20 units
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, false);  // Draw the point as a circle with given radius
+    ctx.fillStyle = lighterColor;
+    ctx.fill();
+    ctx.lineWidth = thickness;
+    ctx.strokeStyle = lightenColor(color, 10);
+    ctx.stroke();
+}
+
+
+
+
 // Assuming that downloadBlob function is defined somewhere, or imported.
