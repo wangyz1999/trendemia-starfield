@@ -1,4 +1,4 @@
-# Trendemia: Your Gateway to Accelerated Academic Research
+# Trendemia-Starfield: Interactive Visulization of Millions of Papers
 
 ![Trendemia Logo](./src/assets/demo.jpg)
 
